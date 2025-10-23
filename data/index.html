@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YOLO_UNO</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/all.min.css">
+
+</head>
+<body>
+    <h1>Welcome to YOLO_UNO</h1>
+    <p>Control your devices and monitor sensors!</p>
+
+<div class="sidebar">
+    <h2>Navigation</h2>
+    <ul>
+        <li><a href="/wifi"><i class="fas fa-wifi"></i> WiFi</a></li>
+        <li><a href="/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="#control-box"><i class="fas fa-cogs"></i> Control Box</a></li>
+        <li><a href="#sensor-box"><i class="fas fa-thermometer-half"></i> Sensor Box</a></li>
+        <li><a href="#mail-setting"><i class="fas fa-envelope"></i> Mail Setting</a></li>
+    </ul>
+    </ul>
+</div>
+
+    <!-- Box cho các nút nhấn -->
+    <div class="box" id = "control-box">
+        <h2>Control Box</h2>
+        <div>LED Single <span id="state1">OFF</span> <button id="toggleButton1">Toggle</button> 
+        </div>
+        <div>LED RGB <span id="state2">OFF</span> <button id="toggleButton2">Toggle</button> 
+        </div>
+        <div>Fan <span id="state3">OFF</span> <button id="toggleButton3">Toggle</button> 
+        </div>
+        <div>Relay <span id="state4">OFF</span> <button id="toggleButton4">Toggle</button> 
+        </div>
+    </div>
+
+    <!-- Box cho các giá trị cảm biến -->
+    <div class="box" id = "sensor-box">
+        <h2>Sensor Box</h2>
+        <div>Temperature: <span id="sensorValue1"></span> °C </div>
+        <div>Humidity: <span id="sensorValue2"></span> % </div>
+        <div>Lux: <span id="sensorValue3"></span> Lux</div>
+        <div>Soil Humidity: <span id="sensorValue4"></span> % </div>
+        <div>Distance: <span id="sensorValue5"></span> cm </div>
+    </div>
+
+        <!-- Form for user settings -->
+    <div class="box" id="mail-setting">
+        <h2>Mail Setting</h2>
+        <form action="/submit-settings" method="post">
+            <div>
+                <label for="email_input">Email Address:</label>
+                <input type="email" id="email_input" name="email_input" required>
+            </div>
+            <div>
+                <label for="enable_email_input">Enable Email Notification:</label>
+                <input type="checkbox" id="enable_email_input" name="enable_email_input" checked>
+            </div>
+            <div>
+                <label for="threshold_input">Temperature Threshold:</label>
+                <input type="number" id="threshold_input" step="0.1" name="threshold_input" required>
+            </div>
+            <div>
+                <label for="email_message">Email Message:</label>
+                <input type="text" id="email_message" name="email_message" value="" required>
+            </div>
+        <button type="submit" id="submit_mail_btn" >Submit</button>
+        </form>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YOLO_UNO</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/all.min.css">
+</head>
+<body>
+    <h1>Welcome to YOLO_UNO</h1>
+    <p>Config your Connect</p>
+
+<div class="sidebar">
+    <h2>Navigation</h2>
+    <ul>
+        <li><a href="/device"><i class="fas fa-microchip"></i> Device</a></li>
+        <li><a href="/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+    </ul>
+    </ul>
+</div>
+    
+    <form id="wifi-config-form" class="box">
+        <h2>WiFi Configuration</h2>
+        <label for="ssid">WiFi Name (SSID):</label>
+        <input type="text" id="ssid" name="ssid" required>
+        <br>
+        <label for="password">WiFi Password:</label>
+        <input type="password" id="password" name="password" required>
+        <br>
+        <button type="submit" id="wifi-connect-btn">Connect WiFi</button>
+    </form>
+
+    <form id="mqtt-config-form" class="box">
+        <h2>MQTT Configuration</h2>
+        <label for="username">MQTT Username:</label>
+        <input type="text" id="username" name="username" required>
+        <br>
+        <label for="key">MQTT Active Key:</label>
+        <input type="password" id="key" name="key" required>
+        <br>
+        <button type="submit" id="mqtt-connect-btn">Connect MQTT</button>
+    </form>
+    <div id="result"></div>
+
+    <script src="js/Wifi.js"></script>
+</body>
+</html>
