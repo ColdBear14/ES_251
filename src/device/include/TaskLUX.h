@@ -5,7 +5,7 @@
 
 extern void TaskLUX(void *pvParameters);
 extern void getValueLux();
-extern int getLux();
+extern float getLux();
 extern void initLUX();
 
 #endif /* INC_TASKLUX_H_ */

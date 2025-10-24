@@ -29,8 +29,8 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
 
 void parseWebSocketMessage(AsyncWebSocketClient *client, const String &message) {
     // Xử lý tin nhắn từ client xử lý lệnh action
-    if (message.startsWith("{\"action\":\"device\"")) {
-        handleDevice(message);
+    if (message.startsWith("{\"action\":\"settings\"")) {
+        handleSettings(message);
     }
     else if (message.startsWith("{\"action\":\"wifi\"")) {
         // Xử lý cấu hình WiFi
@@ -42,37 +42,39 @@ void parseWebSocketMessage(AsyncWebSocketClient *client, const String &message) 
     }
 }
 
+void handleSettings(const String &message){
+    JsonDocument doc;
 
+    // Deserialize the JSON string
+    DeserializationError error = deserializeJson(doc, message);
 
-void handleDevice(const String &message){
-    // Tìm vị trí của "device" và "state"
-    int devicePos = message.indexOf("\"device\":");
-    int statePos = message.indexOf("\"state\":");
+    // Extract values from the JSON document
+    int sensorID = doc["id"].as<int>();
+    const char* name = doc["name"];
+    int period = doc["period"].as<int>();
 
-    // Lấy giá trị device
-    int commaPos = message.indexOf(",", devicePos);
-    String deviceStr = message.substring(devicePos + 9, commaPos);
-    deviceStr.trim();
-    int device = deviceStr.toInt();
-
-    // Lấy giá trị state
-    int quote1 = message.indexOf("\"", statePos + 8);
-    int quote2 = message.indexOf("\"", quote1 + 1);
-    String state = message.substring(quote1 + 1, quote2);
-
-    if(device == 1) {
-        output1State = state;
-    } else if(device == 2) {
-        output2State = state;
-    } else if (device == 3) {
-        output3State = state;
-    } else if (device == 4) {
-        output4State = state;
+    switch (sensorID)
+    {
+    case 1: 
+        sensors[0].name = name;
+        sensors[0].period = period;
+        break;
+    case 2: 
+        sensors[1].name = name;
+        sensors[1].period = period;
+        break;
+    case 3: 
+        sensors[2].name = name;
+        sensors[2].period = period;
+        break;
+    default:
+        break;
     }
+
 }
 
 void handleMQTT(const String &message) {
-    StaticJsonDocument<200> doc;
+    JsonDocument doc;
 
     // Deserialize the JSON string
     DeserializationError error = deserializeJson(doc, message);
@@ -88,7 +90,7 @@ void handleMQTT(const String &message) {
 }
 
 void handleWifiConfig(const String &message) {
-    StaticJsonDocument<200> doc;
+    JsonDocument doc;
 
     // Deserialize the JSON string
     DeserializationError error = deserializeJson(doc, message);
@@ -97,13 +99,12 @@ void handleWifiConfig(const String &message) {
     const char* ssid = doc["ssid"];
     const char* password = doc["password"];
 
-    // Lưu SSID và mật khẩu vào biến toàn cục
     wifi_ssid = ssid;
     wifi_password = password;
 
     WIFI_STATE = 1;
 
-    InitWiFi(); // Gọi hàm khởi tạo WiFi với SSID và mật khẩu mới
+    InitWiFi();
 }
 
 void initWebServer() {
@@ -163,26 +164,46 @@ void webSocketTask(void *pvParameters) {
         ws.cleanupClients();
         ElegantOTA.loop();
 
-        if (ws.availableForWriteAll()) {
-            // float temperature = getTemperature();
-            // float humidity = getHumidity();
-            // int lux = getLux();
-            // float soil = getSoilMoisture();
-            // int distance = getDistanceHC_SR04();
+        unsigned long now = millis();
 
-            // String jsonData = "{ \"temperature\": " + String(temperature) +
-            //                   ", \"humidity\": " + String(humidity) +
-            //                   ", \"lux\": " + String(lux) +
-            //                   ", \"soil\": " + String(soil) +
-            //                   ", \"distance\": " + String(distance) + "}";
-
-            // ws.textAll(jsonData);
-
-            // vTaskDelay(5000 / portTICK_PERIOD_MS);
+        for (int i = 0; i < 5; ++i) {
+            Sensor& s = sensors[i];
+            if (now - s.lastSentTime >= s.period * 1000) {
+                sendSensor(s);
+                s.lastSentTime = now;
+            }
         }
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+
+        vTaskDelay(100 / portTICK_PERIOD_MS); // kiểm tra mỗi 100ms
     }
 }
+
+float readSensorValue(int id) {
+    switch (id) {
+        case 1: return getTempeDHT20();
+        case 2: return getHumDHT20();
+        case 3: return getLux();
+        case 4: return getValueSMS();
+        case 5: return getDistanceHC_SR04();
+        default: return 0.0;
+    }
+}
+
+void sendSensor(Sensor& s) {
+    s.value = readSensorValue(s.id);
+
+    JsonDocument doc;
+    doc["type"] = "sensor";
+    doc["id"] = s.id;
+    doc["value"] = s.value;
+
+    String jsonData;
+    serializeJson(doc, jsonData);
+
+    ws.textAll(jsonData);
+}
+
+
 
 void InitWebServer() {
     xTaskCreate(webServerTask, "WebServerTask", 16384, NULL, 1, NULL);

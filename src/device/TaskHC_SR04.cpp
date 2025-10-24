@@ -1,9 +1,9 @@
 #include "include/TaskHC_SR04.h"
 
-int getDistanceHC_SR04()
+float getDistanceHC_SR04()
 {
     unsigned long duration; // biến đo thời gian
-    int distance;           // biến lưu khoảng cách
+    float distance;           // biến lưu khoảng cách
     
     /* Phát xung từ chân trig */
     digitalWrite(HC_SR04_TRIG_PIN,0);   // tắt chân trig
@@ -15,7 +15,7 @@ int getDistanceHC_SR04()
     // Đo độ rộng xung HIGH ở chân echo. 
     duration = pulseIn(HC_SR04_ECHO_PIN,HIGH);  
     // Tính khoảng cách đến vật.
-    distance = int(duration/2/29.412);
+    distance = float(duration/2/29.412);
     // publishData("DIS", String(distance));
     return distance;
 }

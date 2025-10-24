@@ -1,7 +1,6 @@
 #include "include/TaskMongo.h"
 
 const char* addServer = "http://192.168.4.2:3000/addData";
-const char* getServer = "http://192.168.4.2:3000/getData";
 
 void sendDataToMongoDBTask(void* parameter) {
     String data = *(String*)parameter;

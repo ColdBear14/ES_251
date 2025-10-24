@@ -4,7 +4,7 @@
 #include "globals.h"
 
 extern void TaskSMS(void *pvParameters);
-extern int getValueSMS();
+extern float getValueSMS();
 extern void initSMS();
 
 #endif /* INC_TASKSMS_H_ */

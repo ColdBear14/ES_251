@@ -3,16 +3,13 @@
 void setup()
 {
   Serial.begin(115200);
-  // InitAP();
+  InitAP();
 
   InitWiFi();
 
-  // initMQTT();
-  // InitMQTTTask();
+  InitMQTTTask();
 
-  // InitWebServer();
-
-  // InitMail();
+  InitWebServer();
 
   // initDHT20();
   // initLCD();
@@ -28,7 +25,6 @@ void setup()
   // initHC_SR04();
   // initSMS();
   
-  // InitRS485();
 
 }
 

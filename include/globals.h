@@ -65,4 +65,20 @@
 #define MY_SCL 11
 #define MY_SDA 12
 
+struct Sensor {
+    int id;
+    const char* name;
+    int period;
+    float value;
+    unsigned long lastSentTime;
+};
+
+Sensor sensors[5] = {
+    {1, "Temperature", 5, 0.0, 0},
+    {2, "Humidity", 5, 0.0, 0},
+    {3, "Lux", 5, 0.0, 0},
+    {4, "Soil Humidity", 5, 0.0, 0},
+    {5, "Distance", 5, 0.0, 0}
+};
+
 #endif

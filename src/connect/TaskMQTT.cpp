@@ -20,14 +20,7 @@ void callback(char *topic, byte *payload, unsigned int length)
     {
         message += (char)payload[i];
     }
-    // if (strcmp(topic, (String(IO_USERNAME) + String("/feeds/feed_2")).c_str()) == 0)
-    // {
-    //     Serial.println(message);
-    // }
-    // else if (strcmp(topic, (String(IO_USERNAME) + String("/feeds/feed_3")).c_str()) == 0)
-    // {
-    //     Serial.println(message);
-    // }
+
 }
 
 void publishData(String feed, String data)
@@ -45,11 +38,7 @@ void publishData(String feed, String data)
         Serial.println("MQTT client not connected");
     }
 }
-void initMQTT()
-{
-    client.setServer(MQTT_SERVER, MQTT_PORT);
-    client.setCallback(callback);
-}
+
 void InitMQTT()
 {
     Serial.println("Connecting to MQTT...");
@@ -65,7 +54,6 @@ void InitMQTT()
         Serial.print("MQTT connection failed, rc=");
         Serial.println(client.state());
     }
-    vTaskDelay(1000/ portTICK_PERIOD_MS); // Thêm delay để tránh quá tải CPU
 }
 
 void mqttTask(void *pvParameters) {

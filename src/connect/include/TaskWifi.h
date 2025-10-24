@@ -9,8 +9,6 @@ extern String wifi_password;
 
 extern void InitWiFi();
 
-extern void initWifi();
-
 extern bool Wifi_reconnect();
 
 #endif /* INC_TASKWIFI_H_ */

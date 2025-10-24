@@ -10,8 +10,6 @@ extern int MQTT_STATE;
 
 extern void InitMQTT();
 
-extern void initMQTT();
-
 extern void InitMQTTTask();
 void publishData(String feed, String data);
 

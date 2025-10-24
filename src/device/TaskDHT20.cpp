@@ -9,6 +9,7 @@ void TaskDHT20(void *pvParameters)
     getValueDHT20();
     vTaskDelay(15000 / portTICK_PERIOD_MS);
   }
+  vTaskDelete(NULL);
 }
 
 float getTempeDHT20(){
@@ -31,10 +32,6 @@ void getValueDHT20()
         Serial.println(temperature);
         Serial.print("Humidity:" );
         Serial.println(humidity);
-
-        // if(temperature > TemperatureThreshold.toFloat() && enableEmailChecked == "true"){
-        //     sendEmailThresholdAlert("Temperature", String(temperature, 2));
-        // }
         
         // sendDataSensorData("temperature", String(temperature, 2));
         // sendDataSensorData("humidity", String(humidity, 2));
@@ -46,14 +43,14 @@ void initDHT20()
     Wire.begin(MY_SCL, MY_SDA);
     dht20.begin();
     
-    xTaskCreate(
-      TaskDHT20,    // Function to implement the task
-      "TaskDHT20",  // Name of the task
-      4096,       // Stack size in words
-      NULL,        // Task input parameter
-      1,           // Priority of the task
-      NULL         // Task handle
-  );
+  //   xTaskCreate(
+  //     TaskDHT20,    // Function to implement the task
+  //     "TaskDHT20",  // Name of the task
+  //     4096,       // Stack size in words
+  //     NULL,        // Task input parameter
+  //     1,           // Priority of the task
+  //     NULL         // Task handle
+  // );
 }
 
 

@@ -13,7 +13,7 @@ void TaskSMS(void *pvParameters)
     }
 }
 
-int getValueSMS()
+float getValueSMS()
 {
     SMSValue = analogRead(SMS_PIN); // Read the SMS pin value
     // publishData("SMS", String(SMSValue)); 

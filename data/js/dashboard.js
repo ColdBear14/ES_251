@@ -2,8 +2,7 @@
 
 
 async function fetchSensorData(collection, name = "") {
-    let url = `http://192.168.4.2:3000/getData10?collection=${collection}`;
-    if (name) url += `&name=${name}`;
+    let url = `http://192.168.4.2:3000/getData10?collection=${collection}&name=${name}`;
     const response = await fetch(url);
     if (!response.ok) throw new Error("Network response was not ok");
     return await response.json();

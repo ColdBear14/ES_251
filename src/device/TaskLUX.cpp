@@ -15,8 +15,8 @@ void getValueLux() {
     // publishData("LUX", String(luxValue)); // Giả sử bạn có hàm publishData để gửi dữ liệu lên MQTT
 }
 
-int getLux() {
-    int luxValue = analogRead(LUX_PIN); 
+float getLux() {
+    float luxValue = analogRead(LUX_PIN); 
     return luxValue; // Đọc giá trị từ cảm biến ánh sáng
 }
 

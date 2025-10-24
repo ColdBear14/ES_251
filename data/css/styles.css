@@ -250,3 +250,90 @@ input[type="number"]:focus {
     max-width: 600px;
     flex: 1;
 }
+
+/* Add these styles at the end of the file */
+.sensor-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 0.5fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.sensor-box {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.09);
+    transition: box-shadow 0.2s;
+}
+
+.sensor-box:hover {
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+}
+
+.sensor-box h3 {
+    margin: 0 0 15px 0;
+    color: #333;
+    font-size: 1.5em;
+}
+
+.sensor-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.sensor-value {
+    font-size: 2em;
+    font-weight: bold;
+    color: #4361ee;
+}
+
+.sensor-settings {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.name-setting,
+.period-setting {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.name-setting,
+.period-setting label {
+    font-size: 1.5em;
+    color: #000000;
+}
+
+.sensor-settings input[type="text"],
+.sensor-settings input[type="number"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.9em;
+    width: 50%;
+}
+
+.sensor-settings input[type="number"] {
+    width: 80px;
+}
+
+.sensor-settings button {
+    background-color: #4361ee;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s;
+    width: 30%;
+    align-self: center;
+}
+
+.sensor-settings button:hover {
+    background-color: #3a0ca3;
+}
