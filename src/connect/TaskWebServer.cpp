@@ -1,10 +1,5 @@
 #include "include/TaskWebServer.h"
 
-String output1State = "off";
-String output2State = "off";
-String output3State = "off";
-String output4State = "off";
-
 // Khởi tạo máy chủ HTTP và WebSocket
 AsyncWebServer server(8080); // Máy chủ HTTP chạy trên cổng 80
 AsyncWebSocket ws("/ws"); // Tạo WebSocket tại endpoint "/ws"
@@ -53,11 +48,14 @@ void handleSettings(const String &message){
     const char* name = doc["name"];
     int period = doc["period"].as<int>();
 
+    sendDataSettings(sensorID, String(name), period);
+
     switch (sensorID)
     {
     case 1: 
         sensors[0].name = name;
         sensors[0].period = period;
+
         break;
     case 2: 
         sensors[1].name = name;
@@ -164,16 +162,17 @@ void webSocketTask(void *pvParameters) {
         ws.cleanupClients();
         ElegantOTA.loop();
 
-        unsigned long now = millis();
+        if(WIFI_STATE == 1){
+            unsigned long now = millis();
 
-        for (int i = 0; i < 5; ++i) {
-            Sensor& s = sensors[i];
-            if (now - s.lastSentTime >= s.period * 1000) {
-                sendSensor(s);
-                s.lastSentTime = now;
+            for (int i = 0; i < 3; ++i) {
+                Sensor& s = sensors[i];
+                if (now - s.lastSentTime >= s.period * 1000) {
+                    sendSensor(s);
+                    s.lastSentTime = now;
+                }
             }
         }
-
         vTaskDelay(100 / portTICK_PERIOD_MS); // kiểm tra mỗi 100ms
     }
 }
@@ -183,8 +182,6 @@ float readSensorValue(int id) {
         case 1: return getTempeDHT20();
         case 2: return getHumDHT20();
         case 3: return getLux();
-        case 4: return getValueSMS();
-        case 5: return getDistanceHC_SR04();
         default: return 0.0;
     }
 }

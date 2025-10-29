@@ -14,12 +14,16 @@ void TaskDHT20(void *pvParameters)
 
 float getTempeDHT20(){
   dht20.read();
-  return dht20.getTemperature();
+  float temperature = dht20.getTemperature();
+  sendDataSensorData("temperature", String(temperature, 2));
+  return temperature;
 }
 
 float getHumDHT20(){
   dht20.read();
-  return dht20.getHumidity();
+  float humidity = dht20.getHumidity();
+  sendDataSensorData("humidity", String(humidity, 2));
+  return humidity;
 }
 
 void getValueDHT20()

@@ -12,38 +12,13 @@
     <h1>Welcome to YOLO_UNO</h1>
     <p>Control your devices and monitor sensors!</p>
 
-<div class="sidebar">
-    <h2>Navigation</h2>
-    <ul>
-        <li><a href="/wifi"><i class="fas fa-wifi"></i> WiFi</a></li>
-        <li><a href="/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-        <li><a href="#control-box"><i class="fas fa-cogs"></i> Control Box</a></li>
-        <li><a href="#sensor-box"><i class="fas fa-thermometer-half"></i> Sensor Box</a></li>
-    </ul>
-    </ul>
-</div>
-
-    <!-- Box cho các nút nhấn -->
-    <!-- <div class="box" id = "control-box">
-        <h2>Control Box</h2>
-        <div>LED Single <span id="state1">OFF</span> <button id="toggleButton1">Toggle</button> 
-        </div>
-        <div>LED RGB <span id="state2">OFF</span> <button id="toggleButton2">Toggle</button> 
-        </div>
-        <div>Fan <span id="state3">OFF</span> <button id="toggleButton3">Toggle</button> 
-        </div>
-        <div>Relay <span id="state4">OFF</span> <button id="toggleButton4">Toggle</button> 
-        </div>
-    </div> -->
-
-    <!-- Box cho các giá trị cảm biến -->
-    <div class="box" id = "sensor-box">
-        <h2>Sensor Box</h2>
-        <div>Temperature: <span id="sensorValue1"></span> °C </div>
-        <div>Humidity: <span id="sensorValue2"></span> % </div>
-        <div>Lux: <span id="sensorValue3"></span> Lux</div>
-        <div>Soil Humidity: <span id="sensorValue4"></span> % </div>
-        <div>Distance: <span id="sensorValue5"></span> cm </div>
+    <div class="sidebar">
+        <h2>Navigation</h2>
+        <ul>
+            <li><a href="/wifi"><i class="fas fa-wifi"></i> WiFi</a></li>
+            <li><a href="/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        </ul>
+        </ul>
     </div>
 
     <div class="sensor-container">
@@ -60,7 +35,7 @@
                         </div>
                         <div class="period-setting">
                         <label for="sensorPeriod1">Send period (s):</label>
-                        <input type="number" id="sensorPeriod1" min="1" value="5">
+                        <input type="number" id="sensorPeriod1" min="1" >
                     </div>
                     <button onclick="updateSensorSettings(1)">Save Settings</button>
                 </div>
@@ -80,12 +55,32 @@
                         </div>
                         <div class="period-setting">
                             <label for="sensorPeriod2">Send period (s):</label>
-                            <input type="number" id="sensorPeriod2" min="1" value="5">
+                            <input type="number" id="sensorPeriod2" min="1" >
                     </div>
                     <button onclick="updateSensorSettings(2)">Save Settings</button>
                 </div>
             </div>
         </div>
+            <div class="sensor-box">
+            <h3>Lux</h3>
+            <div class="sensor-content">
+                <div class="sensor-value">
+                    <span id="sensorValue3"></span> Lux 
+                </div>
+                    <div class="sensor-settings">
+                        <div class="name-setting">
+                            <label for="sensorName3">Name :</label>
+                            <input type="text" id="sensorName3" value="Lux">
+                        </div>
+                        <div class="period-setting">
+                            <label for="sensorPeriod3">Send period (s):</label>
+                            <input type="number" id="sensorPeriod3" min="1" >
+                    </div>
+                    <button onclick="updateSensorSettings(3)">Save Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
     <script src="js/script.js"></script>

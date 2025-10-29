@@ -16,7 +16,6 @@ void InitWiFi()
         }
     Serial.println("Connected to WiFI");
     sendDataActionHistory("Wifi", "config successful");
-
     }   
 }
 

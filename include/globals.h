@@ -73,12 +73,6 @@ struct Sensor {
     unsigned long lastSentTime;
 };
 
-Sensor sensors[5] = {
-    {1, "Temperature", 5, 0.0, 0},
-    {2, "Humidity", 5, 0.0, 0},
-    {3, "Lux", 5, 0.0, 0},
-    {4, "Soil Humidity", 5, 0.0, 0},
-    {5, "Distance", 5, 0.0, 0}
-};
+extern Sensor sensors[3];
 
 #endif

@@ -5,13 +5,13 @@ void setup()
   Serial.begin(115200);
   InitAP();
 
-  InitWiFi();
+  // InitWiFi();
 
   InitMQTTTask();
 
   InitWebServer();
 
-  // initDHT20();
+  initDHT20();
   // initLCD();
   // initLED();
 

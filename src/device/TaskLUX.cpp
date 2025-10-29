@@ -17,6 +17,7 @@ void getValueLux() {
 
 float getLux() {
     float luxValue = analogRead(LUX_PIN); 
+    sendDataSensorData("lux", String(luxValue, 2));
     return luxValue; // Đọc giá trị từ cảm biến ánh sáng
 }
 

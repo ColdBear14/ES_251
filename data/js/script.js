@@ -1,11 +1,9 @@
 const ws = new WebSocket(`ws://${location.host}/ws`); // Kết nối WebSocket
 
 const sensors = [
-    { id: 1, name: 'Temperature', unit: '°C', period: 5},
-    { id: 2, name: 'Humidity', unit: '%', period: 5},
-    { id: 3, name: 'Lux', unit: 'Lux', period: 5},
-    { id: 4, name: 'Soil Humidity', unit: '%', period: 5},
-    { id: 5, name: 'Distance', unit: 'cm', period: 5}
+    { id: 1, name: 'Temperature', unit: '°C', period: 10},
+    { id: 2, name: 'Humidity', unit: '%', period: 10},
+    { id: 3, name: 'Lux', unit: 'Lux', period: 10},
 ];
 
 function initializeSensors() {
