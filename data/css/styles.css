@@ -4,7 +4,7 @@ body {
     text-align: center;
     margin: 0;
     padding: 0;
-    background-color: #85CEA8;
+    background-color: #656a97;
 }
 
 h1 {
@@ -175,13 +175,15 @@ input[type="number"]:focus {
       top: 0;
       width: 200px;
       height: 100%;
-      background-color: #f4f4f4;
+      background-color: #1e1e2f;
       padding: 20px;
       box-shadow: 2px 0 5px rgba(0,0,0,0.1);
   }
 
   .sidebar h2 {
       margin-top: 0;
+            color: #fff
+
   }
 
   .sidebar ul {
@@ -197,7 +199,8 @@ input[type="number"]:focus {
 
   .sidebar ul li a {
       text-decoration: none;
-      color: #333;
+      /* color: #333; */
+      color: #fff
   }
 
   .sidebar ul li a:hover {
