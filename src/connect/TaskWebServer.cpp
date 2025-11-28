@@ -124,13 +124,18 @@ void initWebServer() {
   ws.onEvent(onEvent);
 
   server.addHandler(&ws);
-    server.on("/wifi", HTTP_GET, [](AsyncWebServerRequest *request)
-            { request->send(LittleFS, "/wifi.html", "text/html"); });
-    server.on("/device", HTTP_GET, [](AsyncWebServerRequest *request)
+    server.on("/index", HTTP_GET, [](AsyncWebServerRequest *request)
             { request->send(LittleFS, "/index.html", "text/html"); });
+    server.on("/device", HTTP_GET, [](AsyncWebServerRequest *request)
+            { request->send(LittleFS, "/device.html", "text/html"); });
     server.on("/dashboard", HTTP_GET, [](AsyncWebServerRequest *request)
             { request->send(LittleFS, "/dashboard.html", "text/html"); });
+    server.on("/wifi", HTTP_GET, [](AsyncWebServerRequest *request)
+            { request->send(LittleFS, "/wifi.html", "text/html"); });
 
+
+    server.on("/js/sideboard.js", HTTP_GET, [](AsyncWebServerRequest *request)
+            { request->send(LittleFS, "/js/sideboard.js", "application/javascript"); });
     server.on("/js/Wifi.js", HTTP_GET, [](AsyncWebServerRequest *request)
             { request->send(LittleFS, "/js/Wifi.js", "application/javascript"); });
     server.on("/js/script.js", HTTP_GET, [](AsyncWebServerRequest *request)
@@ -144,6 +149,14 @@ void initWebServer() {
             { request->send(LittleFS, "/css/styles.css", "text/css"); });
     server.on("/css/all.min.css", HTTP_GET, [](AsyncWebServerRequest *request)
             { request->send(LittleFS, "/css/all.min.css", "text/css"); });
+    server.on("/css/style_new_sideboard.css", HTTP_GET, [](AsyncWebServerRequest *request)
+            { request->send(LittleFS, "/css/style_new_sideboard.css", "text/css"); });      
+    server.on("/css/wifi.min.css", HTTP_GET, [](AsyncWebServerRequest *request)
+            { request->send(LittleFS, "/css/wifi.min.css", "text/css"); });
+    server.on("/css/device.min.css", HTTP_GET, [](AsyncWebServerRequest *request)
+            { request->send(LittleFS, "/css/device.min.css", "text/css"); });   
+    server.on("/css/bootstrap.min.css", HTTP_GET, [](AsyncWebServerRequest *request)
+            { request->send(LittleFS, "/css/bootstrap.min.css", "text/css"); });
 
     server.on("/webfonts/fa-solid-900.woff2", HTTP_GET, [](AsyncWebServerRequest *request)
             { request->send(LittleFS, "/webfonts/fa-solid-900.woff2", "font/woff2"); });
@@ -179,8 +192,8 @@ void webSocketTask(void *pvParameters) {
 
 float readSensorValue(int id) {
     switch (id) {
-        case 1: return getTempeDHT20();
-        case 2: return getHumDHT20();
+        case 1: return getTempeDHT11();
+        case 2: return getHumDHT11();
         case 3: return getLux();
         default: return 0.0;
     }
@@ -204,5 +217,5 @@ void sendSensor(Sensor& s) {
 
 void InitWebServer() {
     xTaskCreate(webServerTask, "WebServerTask", 16384, NULL, 1, NULL);
-    xTaskCreate(webSocketTask, "WebSocketTask", 8192, NULL, 1, NULL);
+    xTaskCreate(webSocketTask, "WebSocketTask", 8192, NULL, 2, NULL);
 }
