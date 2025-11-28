@@ -10,6 +10,8 @@ document.getElementById('wifi-config-form').addEventListener('submit', async fun
         return;
     }
 
+    alert(`Connect wifi: ${ssid}`);
+
     ws.send(JSON.stringify({
         action: "wifi",
         ssid: ssid,

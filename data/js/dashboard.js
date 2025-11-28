@@ -2,7 +2,7 @@
 
 
 async function fetchSensorData(collection, name = "") {
-    let url = `http://172.28.16.1:3000/getData10?collection=${collection}&name=${name}`;
+    let url = `http://192.168.4.2:3000/getData10?collection=${collection}&name=${name}`;
     const response = await fetch(url);
     if (!response.ok) throw new Error("Network response was not ok");
     return await response.json();
@@ -42,7 +42,7 @@ async function loadDashboard() {
         const humData = await fetchSensorData("sensor", "humidity");
         renderChart("sensorChart2", "Humidity (%)", humData, "rgba(54,162,235,1)");
 
-        // // Lux
+        // // Lux`
         const luxData = await fetchSensorData("sensor", "lux");
         renderChart("sensorChart3", "Lux", luxData, "rgba(255,206,86,1)");
 
@@ -57,5 +57,5 @@ document.addEventListener('DOMContentLoaded', () => {
     loadDashboard();
 
     // 2. Thiết lập một bộ đếm thời gian để gọi lại hàm loadSensor mỗi 10 giây (10000 mili giây)
-    setInterval(loadDashboard, 60000);
+    setInterval(loadDashboard, 1000);
 });

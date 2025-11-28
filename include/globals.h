@@ -27,6 +27,9 @@
 #include <ArduinoJson.h>
 #include <WiFiClientSecure.h>
 
+#include <Adafruit_Sensor.h>
+#include <DHT.h>
+#include <DHT_U.h>
 
 ///
 #include "../src/connect/include/TaskWifi.h"
@@ -36,6 +39,7 @@
 #include "../src/connect/include/TaskMongo.h"
 
 #include "../src/device/include/TaskDHT20.h"
+#include "../src/device/include/TaskDHT11.h"
 #include "../src/device/include/TaskPIR.h"
 #include "../src/device/include/TaskHC_SR04.h"
 #include "../src/device/include/TaskLED.h"
@@ -64,6 +68,10 @@
 
 #define MY_SCL 11
 #define MY_SDA 12
+
+#define DHTPIN 2 
+#define DHTTYPE    DHT11 
+
 
 struct Sensor {
     int id;
