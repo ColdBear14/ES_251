@@ -1,8 +1,8 @@
 // Hàm lấy dữ liệu từ server
 
 
-async function fetchSensorData(collection, name = "") {
-    let url = `http://172.28.16.1:3000/getData10?collection=${collection}&name=${name}`;
+async function fetchSensorData(collection, sensorId = "") {
+    let url = `http://192.168.4.2:3000/getData10?collection=${collection}&sensorId=${sensorId}`;
     const response = await fetch(url);
     if (!response.ok) throw new Error("Network response was not ok");
     return await response.json();
@@ -35,15 +35,15 @@ function renderChart(canvasId, label, sensorData, color) {
 async function loadDashboard() {
     try {
         // Temperature
-        const tempData = await fetchSensorData("sensor", "temperature");
+        const tempData = await fetchSensorData("sensor", "1");
         renderChart("sensorChart1", "Temperature (°C)", tempData, "rgba(255,99,132,1)");
 
         // Humidity
-        const humData = await fetchSensorData("sensor", "humidity");
+        const humData = await fetchSensorData("sensor", "2");
         renderChart("sensorChart2", "Humidity (%)", humData, "rgba(54,162,235,1)");
 
         // // Lux
-        const luxData = await fetchSensorData("sensor", "lux");
+        const luxData = await fetchSensorData("sensor", "3");
         renderChart("sensorChart3", "Lux", luxData, "rgba(255,206,86,1)");
 
 

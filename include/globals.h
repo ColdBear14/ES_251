@@ -46,9 +46,6 @@
 #include "../src/device/include/TaskLCD.h"
 #include "../src/device/include/TaskRelay.h"
 
-
-#define delay_time 10000
-
 #define PIR_SENSOR_PIN 7 
 
 #define HC_SR04_TRIG_PIN 18
@@ -67,10 +64,11 @@
 
 struct Sensor {
     int id;
-    const char* name;
+    String name;
     int period;
     float value;
     unsigned long lastSentTime;
+    unsigned long lastReadTime; // Thêm trường này
 };
 
 extern Sensor sensors[3];

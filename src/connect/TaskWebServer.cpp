@@ -1,7 +1,7 @@
 #include "include/TaskWebServer.h"
 
 // Khởi tạo máy chủ HTTP và WebSocket
-AsyncWebServer server(8080); // Máy chủ HTTP chạy trên cổng 80
+AsyncWebServer server(8000); // Máy chủ HTTP chạy trên cổng 80
 AsyncWebSocket ws("/ws"); // Tạo WebSocket tại endpoint "/ws"
 
 void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len)
@@ -45,7 +45,7 @@ void handleSettings(const String &message){
 
     // Extract values from the JSON document
     int sensorID = doc["id"].as<int>();
-    const char* name = doc["name"];
+    String name = doc["name"].as<String>();
     int period = doc["period"].as<int>();
 
     sendDataSettings(sensorID, String(name), period);
@@ -93,16 +93,45 @@ void handleWifiConfig(const String &message) {
     // Deserialize the JSON string
     DeserializationError error = deserializeJson(doc, message);
 
-    // Extract values from the JSON document
+    if (error) {
+        Serial.print("JSON parsing failed: ");
+        Serial.println(error.c_str());
+        return;
+    }
+
+    // Extract values từ JSON và kiểm tra kỹ hơn
     const char* ssid = doc["ssid"];
     const char* password = doc["password"];
 
-    wifi_ssid = ssid;
-    wifi_password = password;
+    // Kiểm tra SSID kỹ lưỡng
+    if (ssid == nullptr || strlen(ssid) == 0) {
+        Serial.println("Error: SSID is null or empty!");
+        return;
+    }
 
-    WIFI_STATE = 1;
+    if (strlen(ssid) > 32) { // SSID tối đa 32 ký tự
+        Serial.println("Error: SSID too long! Max 32 characters.");
+        return;
+    }
 
-    InitWiFi();
+    // Kiểm tra password
+    if (password != nullptr && strlen(password) > 64) { // Password tối đa 64 ký tự
+        Serial.println("Error: Password too long! Max 64 characters.");
+        return;
+    }
+
+    // Gán giá trị sau khi đã kiểm tra
+    wifi_ssid = String(ssid);
+    wifi_password = (password != nullptr) ? String(password) : "";
+
+    Serial.println("Received WiFi config:");
+    Serial.println("SSID: " + wifi_ssid);
+    Serial.println("Password length: " + String(wifi_password.length()));
+
+    WIFI_SEND = 1;
+
+    // Gọi hàm kết nối WiFi
+    InitWifi();
 }
 
 void initWebServer() {
@@ -124,12 +153,17 @@ void initWebServer() {
   ws.onEvent(onEvent);
 
   server.addHandler(&ws);
+    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
+            { request->send(LittleFS, "/home.html", "text/html"); });
     server.on("/wifi", HTTP_GET, [](AsyncWebServerRequest *request)
             { request->send(LittleFS, "/wifi.html", "text/html"); });
     server.on("/device", HTTP_GET, [](AsyncWebServerRequest *request)
             { request->send(LittleFS, "/index.html", "text/html"); });
     server.on("/dashboard", HTTP_GET, [](AsyncWebServerRequest *request)
             { request->send(LittleFS, "/dashboard.html", "text/html"); });
+
+    server.on("/images/logo.png", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send(LittleFS, "/images/logo.png", "image/png"); });
 
     server.on("/js/Wifi.js", HTTP_GET, [](AsyncWebServerRequest *request)
             { request->send(LittleFS, "/js/Wifi.js", "application/javascript"); });
@@ -161,48 +195,13 @@ void webSocketTask(void *pvParameters) {
     while (true) {
         ws.cleanupClients();
         ElegantOTA.loop();
-
-        if(WIFI_STATE == 1){
-            unsigned long now = millis();
-
-            for (int i = 0; i < 3; ++i) {
-                Sensor& s = sensors[i];
-                if (now - s.lastSentTime >= s.period * 1000) {
-                    sendSensor(s);
-                    s.lastSentTime = now;
-                }
-            }
-        }
+        
         vTaskDelay(100 / portTICK_PERIOD_MS); // kiểm tra mỗi 100ms
     }
 }
 
-float readSensorValue(int id) {
-    switch (id) {
-        case 1: return getTempeDHT20();
-        case 2: return getHumDHT20();
-        case 3: return getLux();
-        default: return 0.0;
-    }
-}
-
-void sendSensor(Sensor& s) {
-    s.value = readSensorValue(s.id);
-
-    JsonDocument doc;
-    doc["type"] = "sensor";
-    doc["id"] = s.id;
-    doc["value"] = s.value;
-
-    String jsonData;
-    serializeJson(doc, jsonData);
-
-    ws.textAll(jsonData);
-}
-
-
 
 void InitWebServer() {
-    xTaskCreate(webServerTask, "WebServerTask", 16384, NULL, 1, NULL);
-    xTaskCreate(webSocketTask, "WebSocketTask", 8192, NULL, 1, NULL);
+    xTaskCreate(webServerTask, "WebServerTask", 20000, NULL, 1, NULL);
+    xTaskCreate(webSocketTask, "WebSocketTask", 10000, NULL, 1, NULL);
 }

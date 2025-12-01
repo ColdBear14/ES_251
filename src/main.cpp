@@ -5,13 +5,17 @@ void setup()
   Serial.begin(115200);
   InitAP();
 
-  // InitWiFi();
+  // InitWifi();
 
-  InitMQTTTask();
+  // InitMQTTTask();
+
+  initMongoTask();
 
   InitWebServer();
 
   initDHT20();
+  initLUX();
+
   // initLCD();
   // initLED();
 
@@ -21,7 +25,6 @@ void setup()
 
   // initPIR();
 
-  // initLUX();
   // initHC_SR04();
   // initSMS();
   
@@ -30,10 +33,6 @@ void setup()
 
 void loop()
 {
-  if (!Wifi_reconnect())
-  {
-    return;
-  }
 
 
 }

@@ -9,7 +9,7 @@ document.getElementById('wifi-config-form').addEventListener('submit', async fun
         alert("Vui lòng điền đầy đủ thông tin WiFi!");
         return;
     }
-
+    alert(`Đã gửi tín hiệu kết nối với WIFI ${ssid}`);  
     ws.send(JSON.stringify({
         action: "wifi",
         ssid: ssid,

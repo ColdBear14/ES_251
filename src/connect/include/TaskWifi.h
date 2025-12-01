@@ -3,11 +3,13 @@
 
 #include "globals.h"
 
-extern int WIFI_STATE;
+extern bool WIFI_STATE;
+extern bool WIFI_SEND;
+
 extern String wifi_ssid;
 extern String wifi_password;
 
-extern void InitWiFi();
+extern void InitWifi();
 
 extern bool Wifi_reconnect();
 

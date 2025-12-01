@@ -1,12 +1,16 @@
-#ifndef INC_TASKMONGO_H_
-#define INC_TASKMONGO_H_
+#ifndef TASKMONGO_H
+#define TASKMONGO_H
 
-#include "globals.h"
+#include <Arduino.h>
+#include <HTTPClient.h>
+#include "globals.h" // Chứa các biến toàn cục nếu cần
 
-void sendDataToMongoDBTask(void* parameter);
-extern void sendDataActionHistory(const String& name, const String& action);
-extern void sendDataSensorData(const String& sensorName, const String& sensorValue);
-extern void sendDataSettings(const int& id, const String& name, const int& period);
+// Khai báo hàm khởi tạo Task gửi MongoDB (gọi 1 lần ở setup)
+void initMongoTask(); 
 
+// Các hàm đẩy dữ liệu vào hàng đợi (Queue)
+void sendDataActionHistory(const String& name, const String& action);
+void sendDataSensorData(const String& id, const String& sensorName, const String& sensorValue, const String& period);
+void sendDataSettings(const int& id, const String& name, const int& period);
 
-#endif /* INC_TASKMONGO_H_ */
+#endif // TASKMONGO_H

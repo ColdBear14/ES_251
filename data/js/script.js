@@ -6,19 +6,80 @@ const sensors = [
     { id: 3, name: 'Lux', unit: 'Lux', period: 10},
 ];
 
-function initializeSensors() {
-    sensors.forEach(sensor => {
-        const savedName = localStorage.getItem(`sensorName${sensor.id}`);
-        const savedPeriod = localStorage.getItem(`sensorPeriod${sensor.id}`);
-        
-        if (savedName) {
-            document.getElementById(`sensorName${sensor.id}`).value = savedName;
-        }
-        if (savedPeriod) {
-            document.getElementById(`sensorPeriod${sensor.id}`).value = savedPeriod;
-        }
-    });
+async function fetchSensorData(collection, sensorId = "") {
+    let url = `http://192.168.4.2:3000/getData?collection=${collection}&sensorId=${sensorId}`;
+    try  {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Network response was not ok");
+
+        const data = await response.json();
+        return data;
+    }
+    catch (error) {
+        console.error("Fetch sensor data error:", error);
+        return null;
+    }
 }
+
+async function loadStoredSettings() {
+    for (const sensor of sensors) {
+        // Gọi API lấy setting mới nhất từ server (lưu ý tham số id thay vì sensorId cho settings)
+        // Ta dùng lại hàm fetchSensorData nhưng sửa url trong đó một chút hoặc gọi fetch trực tiếp
+        // Để đơn giản, ta sửa URL trong fetchSensorData để hỗ trợ cả 'id'
+        
+        let url = `http://192.168.4.2:3000/getData?collection=settings&id=${sensor.id}`;
+        
+        try {
+            const response = await fetch(url);
+            const rawData = await response.json();
+
+            if (Array.isArray(rawData) && rawData.length > 0) {
+                const setting = rawData[0];
+                
+                // Cập nhật lên giao diện
+                const nameInput = document.getElementById(`sensorName${setting.id}`);
+                const periodInput = document.getElementById(`sensorPeriod${setting.id}`);
+                
+                if (nameInput) nameInput.value = setting.name;
+                if (periodInput) periodInput.value = setting.period;
+                
+                // Cập nhật luôn biến local sensor sensors để đồng bộ
+                sensor.name = setting.name;
+                sensor.period = setting.period;
+            }
+        } catch (e) {
+            console.log("Không tải được settings cho ID " + sensor.id);
+        }
+    }
+}
+
+async function updateAllSensorValues() {
+    for (const sensor of sensors) {
+        // Gọi API lấy dữ liệu
+        const rawData = await fetchSensorData("sensor", sensor.id);
+        
+        // Kiểm tra xem dữ liệu có hợp lệ không
+        if (Array.isArray(rawData) && rawData.length > 0) {
+            const data = rawData[0]; // Lấy phần tử mới nhất
+            
+            const element = document.getElementById(`sensorValue${data.sensorId}`);
+            
+            if (element) {
+                element.textContent = data.value; // Cập nhật giá trị
+
+            }
+
+        } 
+        // Dự phòng trường hợp trả về object đơn lẻ (nếu bạn đổi logic server sau này)
+        else if (rawData && rawData.value !== undefined && rawData.sensorId !== undefined) {
+             const element = document.getElementById(`sensorValue${rawData.sensorId}`);
+             if (element) {
+                element.textContent = rawData.value;
+            }
+        }
+    }
+}
+
 
 function updateSensorSettings(sensorId) {
     const name = document.getElementById(`sensorName${sensorId}`).value;
@@ -29,10 +90,6 @@ function updateSensorSettings(sensorId) {
         alert('Period must be at least 1 second');
         return;
     }
-
-    // Save to localStorage
-    localStorage.setItem(`sensorName${sensorId}`, name);
-    localStorage.setItem(`sensorPeriod${sensorId}`, period);
 
     // Send to server
     ws.send(JSON.stringify({
@@ -50,21 +107,11 @@ function updateSensorSettings(sensorId) {
     }, 1000);
 }
 
-// WebSocket message handler
-ws.onmessage = function(event) {
-    try {
-        const data = JSON.parse(event.data);
-        if (data.type === 'sensor' && data.id) {
-            document.getElementById(`sensorValue${data.id}`).textContent = data.value;
-        }
-    } catch (error) {
-        console.error('WebSocket message error:', error);
-    }
-};
-
 // Initialize everything when page loads
 document.addEventListener('DOMContentLoaded', () => {
-    initializeSensors();
+    loadStoredSettings();
+    updateAllSensorValues();
+    setInterval(updateAllSensorValues, 5000);
 });
 
 

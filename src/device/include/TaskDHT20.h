@@ -5,11 +5,8 @@
 
 extern DHT20 dht20;
 
-extern void TaskDHT20(void *pvParameters);
-
 extern float getTempeDHT20();
 extern float getHumDHT20();
-extern void getValueDHT20();
 
 extern void initDHT20();
 
