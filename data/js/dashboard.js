@@ -1,14 +1,21 @@
 // Hàm lấy dữ liệu từ server
 
+const sensors = [
+    { id: 1, name: 'Temperature', unit: '°C', period: 10},
+    { id: 2, name: 'Humidity', unit: '%', period: 10},
+    { id: 3, name: 'Lux', unit: 'Lux', period: 10},
+];
 
 async function fetchSensorData(collection, sensorId = "") {
     let url = `http://192.168.4.2:3000/getData10?collection=${collection}&sensorId=${sensorId}`;
     const response = await fetch(url);
     if (!response.ok) throw new Error("Network response was not ok");
-    return await response.json();
+
+    const data = await response.json();
+    return data;
+
 }
 
-// Hàm vẽ biểu đồ với Chart.js
 function renderChart(canvasId, label, sensorData, color) {
     const ctx = document.getElementById(canvasId).getContext('2d');
     new Chart(ctx, {
@@ -31,9 +38,8 @@ function renderChart(canvasId, label, sensorData, color) {
     });
 }
 
-// Lấy và vẽ dữ liệu sensor
 async function loadDashboard() {
-    try {
+        try {
         // Temperature
         const tempData = await fetchSensorData("sensor", "1");
         renderChart("sensorChart1", "Temperature (°C)", tempData, "rgba(255,99,132,1)");
@@ -50,12 +56,11 @@ async function loadDashboard() {
     } catch (err) {
         console.error("Error loading dashboard:", err);
     }
+        
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Tải dữ liệu ngay lập tức khi trang vừa mở
     loadDashboard();
 
-    // 2. Thiết lập một bộ đếm thời gian để gọi lại hàm loadSensor mỗi 10 giây (10000 mili giây)
     setInterval(loadDashboard, 60000);
 });
