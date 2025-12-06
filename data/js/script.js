@@ -7,7 +7,7 @@ const sensors = [
 ];
 
 async function fetchSensorData(collection, sensorId = "") {
-    let url = `http://192.168.4.2:3000/getData?collection=${collection}&sensorId=${sensorId}`;
+    let url = `http://10.135.180.108:3000/getData?collection=${collection}&sensorId=${sensorId}`;
     try  {
         const response = await fetch(url);
         if (!response.ok) throw new Error("Network response was not ok");
@@ -23,11 +23,9 @@ async function fetchSensorData(collection, sensorId = "") {
 
 async function loadStoredSettings() {
     for (const sensor of sensors) {
-        // Gọi API lấy setting mới nhất từ server (lưu ý tham số id thay vì sensorId cho settings)
-        // Ta dùng lại hàm fetchSensorData nhưng sửa url trong đó một chút hoặc gọi fetch trực tiếp
-        // Để đơn giản, ta sửa URL trong fetchSensorData để hỗ trợ cả 'id'
+
         
-        let url = `http://192.168.4.2:3000/getData?collection=settings&id=${sensor.id}`;
+        let url = `http://10.135.180.108:3000/getData?collection=settings&id=${sensor.id}`;
         
         try {
             const response = await fetch(url);
@@ -55,7 +53,6 @@ async function loadStoredSettings() {
 
 async function updateAllSensorValues() {
     for (const sensor of sensors) {
-        // Gọi API lấy dữ liệu
         const rawData = await fetchSensorData("sensor", sensor.id);
         
         // Kiểm tra xem dữ liệu có hợp lệ không

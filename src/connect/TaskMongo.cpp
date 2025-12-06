@@ -1,9 +1,55 @@
 #include "include/TaskMongo.h"
 
-const char* addServer = "http://192.168.4.2:3000/addData";
+const char* addServer = "http://10.135.180.108:3000/addData";
+const char* getServer = "http://10.135.180.108:3000/getData";
 
-// Tạo hàng đợi để chứa các String JSON cần gửi
 QueueHandle_t mongoQueue;
+
+unsigned long lastSyncTime = 0;
+const unsigned long SYNC_INTERVAL = 5000;
+
+void getDataFromMongoDB(const String& collection, const String& sensorId) {
+    if (WiFi.status() == WL_CONNECTED) {
+        HTTPClient http;
+        
+        // 1. Tạo URL query parameters
+        String url = String(getServer) + "?collection=" + collection;
+        if (sensorId != "") {
+            url += "&sensorId=" + sensorId;
+        }
+
+
+        http.begin(url);
+        
+        int httpResponseCode = http.GET();
+        
+        if (httpResponseCode > 0) {
+            String payload = http.getString();
+
+            JsonDocument doc; 
+            doc["action"] = "mongo_update";
+            
+            JsonDocument serverDoc;
+            DeserializationError error = deserializeJson(serverDoc, payload);
+            
+            if (!error) {
+                doc["data"] = serverDoc; // Nhúng object/array từ server vào
+                
+                String wsMessage;
+                serializeJson(doc, wsMessage);
+                
+                sendWebSocketMessage(wsMessage);
+                Serial.println("[MONGO] Data forwarded to WebSocket");
+            } else {
+                Serial.println("[MONGO] Server response not JSON");
+            }
+
+        } else {
+            Serial.printf("[MONGO] GET Failed: %s\n", http.errorToString(httpResponseCode).c_str());
+        }
+        http.end();
+    }
+}
 
 // Task này sẽ chạy liên tục, chờ có dữ liệu trong Queue thì lấy ra gửi
 void taskProcessMongoDB(void *pvParameters) {
@@ -21,7 +67,6 @@ void taskProcessMongoDB(void *pvParameters) {
                 int httpResponseCode = http.POST(*receivedData);
 
                 if (httpResponseCode > 0) {
-                    // Serial.println(http.getString()); // Debug nếu cần
                 } else {
                     Serial.printf("Error sending data: %s\n", http.errorToString(httpResponseCode).c_str());
                 }
@@ -30,8 +75,16 @@ void taskProcessMongoDB(void *pvParameters) {
                 Serial.println("WiFi Disconnected, skipping Mongo upload");
             }
 
-            // QUAN TRỌNG: Giải phóng bộ nhớ đã cấp phát bên ngoài
             delete receivedData; 
+        }
+        if (millis() - lastSyncTime > SYNC_INTERVAL) {
+            for(int i = 0; i < 3; i++) {
+                String sensorId = String(sensors[i].id);
+                getDataFromMongoDB("sensor", sensorId); 
+            }            
+
+            
+            lastSyncTime = millis();
         }
     }
 }
@@ -93,3 +146,5 @@ void sendDataSettings(const int& id, const String& name, const int& period) {
     *data += "\"}";
     sendToQueue(data);
 }
+
+

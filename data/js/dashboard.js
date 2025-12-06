@@ -7,7 +7,7 @@ const sensors = [
 ];
 
 async function fetchSensorData(collection, sensorId = "") {
-    let url = `http://192.168.4.2:3000/getData10?collection=${collection}&sensorId=${sensorId}`;
+    let url = `http://10.135.180.108:3000/getData10?collection=${collection}&sensorId=${sensorId}`;
     const response = await fetch(url);
     if (!response.ok) throw new Error("Network response was not ok");
 
@@ -62,5 +62,5 @@ async function loadDashboard() {
 document.addEventListener('DOMContentLoaded', () => {
     loadDashboard();
 
-    setInterval(loadDashboard, 60000);
+    setInterval(loadDashboard, 10000);
 });

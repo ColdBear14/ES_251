@@ -200,6 +200,10 @@ void webSocketTask(void *pvParameters) {
     }
 }
 
+void sendWebSocketMessage(String message) {
+    ws.textAll(message); 
+}
+
 
 void InitWebServer() {
     xTaskCreate(webServerTask, "WebServerTask", 20000, NULL, 1, NULL);

@@ -17,6 +17,7 @@ void sendSensor(Sensor &s);
 void handleSettings(const String &message);
 void handleWifiConfig(const String &message);
 void handleMQTT(const String &message);
+void sendWebSocketMessage(String message);
 
 extern void InitWebServer();
 

@@ -8,6 +8,9 @@
 // Khai báo hàm khởi tạo Task gửi MongoDB (gọi 1 lần ở setup)
 void initMongoTask(); 
 
+void getDataFromMongoDB(const String& collection, const String& sensorId);
+void sendToQueue(String* payload);
+
 // Các hàm đẩy dữ liệu vào hàng đợi (Queue)
 void sendDataActionHistory(const String& name, const String& action);
 void sendDataSensorData(const String& id, const String& sensorName, const String& sensorValue, const String& period);
