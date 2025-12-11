@@ -35,6 +35,35 @@ void parseWebSocketMessage(AsyncWebSocketClient *client, const String &message) 
         // Xử lý cấu hình MQTT
         handleMQTT(message);
     }
+    else if (message.startsWith("{\"action\":\"get_history\"")) {
+        // Xử lý yêu cầu lịch sử dữ liệu
+        handleGetHistory(message);
+    }
+}
+
+void handleGetHistory(const String &message) {
+    JsonDocument doc;
+
+    // Deserialize the JSON string
+    DeserializationError error = deserializeJson(doc, message);
+
+    // Extract values from the JSON document
+    int sensorID = doc["sensorId"].as<int>();
+
+    switch (sensorID)
+    {
+    case 1: 
+        getHistoryFromMongoDB("sensor", "1");
+        break;
+    case 2: 
+        getHistoryFromMongoDB("sensor", "2");
+        break;
+    case 3: 
+        getHistoryFromMongoDB("sensor", "3");
+        break;
+    default:
+        break;
+    }
 }
 
 void handleSettings(const String &message){

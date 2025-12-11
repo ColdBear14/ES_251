@@ -2,7 +2,7 @@
 
 void LuxTask(void *pvParameters) {
   while (true) {
-      if(WIFI_STATE == 1) { // Chỉ đọc sensor khi WiFi đã kết nối
+      if(WiFi.status() == WL_CONNECTED) { // Chỉ đọc sensor khi WiFi đã kết nối
           unsigned long now = millis();
               if (now - sensors[2].lastReadTime >= sensors[2].period * 1000) {
                   sensors[2].value = getLux();

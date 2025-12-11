@@ -17,7 +17,7 @@ void setup()
   initLUX();
 
   // initLCD();
-  // initLED();
+  initLED();
 
   // initRGB();
   // initRelay();

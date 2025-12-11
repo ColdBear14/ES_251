@@ -35,6 +35,7 @@ void InitWifi() {
     if (WiFi.status() == WL_CONNECTED) {
         WIFI_STATE = 1;
         Serial.println("\nConnected to WiFi!");
+        triggerLedBlink();
         Serial.print("IP Address: ");
         Serial.println(WiFi.localIP());
         sendDataActionHistory("Wifi", "Config successful - Connected to: " + wifi_ssid);

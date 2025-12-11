@@ -4,7 +4,7 @@ DHT20 dht20;
 
 void TempTask(void *pvParameters) {
   while (true) {
-      if(WIFI_STATE == 1) { // Chỉ đọc sensor khi WiFi đã kết nối
+      if(WiFi.status() == WL_CONNECTED) { // Chỉ đọc sensor khi WiFi đã kết nối
           unsigned long now = millis();
               if (now - sensors[0].lastReadTime >= sensors[0].period * 1000) {
                   sensors[0].value = getTempeDHT20();
@@ -17,7 +17,7 @@ void TempTask(void *pvParameters) {
 }
 void HumidTask(void *pvParameters) {
   while (true) {
-      if(WIFI_STATE == 1) { // Chỉ đọc sensor khi WiFi đã kết nối
+      if(WiFi.status() == WL_CONNECTED) { 
           unsigned long now = millis();
               if (now - sensors[1].lastReadTime >= sensors[1].period * 1000) {
                   sensors[1].value = getHumDHT20();

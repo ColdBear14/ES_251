@@ -3,7 +3,8 @@
 
 #include "globals.h"
 
-extern void TaskLED(void *pvParameters);
-extern void initLED();
+void initLED();
+
+void triggerLedBlink();
 
 #endif /* INC_TASKLED_H_ */

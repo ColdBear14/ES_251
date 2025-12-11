@@ -1,66 +1,101 @@
-// Hàm lấy dữ liệu từ server
+const ws = new WebSocket(`ws://${location.host}/ws`);
+const charts = {}; // Lưu trữ biểu đồ
 
 const sensors = [
-    { id: 1, name: 'Temperature', unit: '°C', period: 10},
-    { id: 2, name: 'Humidity', unit: '%', period: 10},
-    { id: 3, name: 'Lux', unit: 'Lux', period: 10},
+    { id: 1, name: 'Temperature', color: "rgba(255,99,132,1)" },
+    { id: 2, name: 'Humidity', color: "rgba(54,162,235,1)" },
+    { id: 3, name: 'Lux', color: "rgba(255,206,86,1)" },
 ];
 
-async function fetchSensorData(collection, sensorId = "") {
-    let url = `http://10.135.180.108:3000/getData10?collection=${collection}&sensorId=${sensorId}`;
-    const response = await fetch(url);
-    if (!response.ok) throw new Error("Network response was not ok");
-
-    const data = await response.json();
-    return data;
-
-}
-
-function renderChart(canvasId, label, sensorData, color) {
-    const ctx = document.getElementById(canvasId).getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: sensorData.map(d => new Date(d.timestamp).toLocaleTimeString()),
-            datasets: [{
-                label: label,
-                data: sensorData.map(d => d.value),
-                borderColor: color,
-                backgroundColor: "rgba(255, 255, 255, 1)",
-                fill: true,
-                tension: 0.2
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: true } }
+// --- 1. KHỞI TẠO BIỂU ĐỒ TRỐNG ---
+function initEmptyCharts() {
+    sensors.forEach(sensor => {
+        const ctx = document.getElementById(`sensorChart${sensor.id}`);
+        if (ctx) {
+            charts[sensor.id] = new Chart(ctx.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: sensor.name,
+                        data: [],
+                        borderColor: sensor.color,
+                        backgroundColor: sensor.color.replace("1)", "0.2)"),
+                        fill: true,
+                        tension: 0.2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: true } }
+                }
+            });
         }
     });
 }
 
-async function loadDashboard() {
-        try {
-        // Temperature
-        const tempData = await fetchSensorData("sensor", "1");
-        renderChart("sensorChart1", "Temperature (°C)", tempData, "rgba(255,99,132,1)");
+ws.onopen = () => {
+    console.log("WebSocket Connected. Requesting History...");
+    
+    sensors.forEach(s => {
+        ws.send(JSON.stringify({
+            action: "get_history",
+            sensorId: s.id
+        }));
+    });
+};
 
-        // Humidity
-        const humData = await fetchSensorData("sensor", "2");
-        renderChart("sensorChart2", "Humidity (%)", humData, "rgba(54,162,235,1)");
+ws.onmessage = (event) => {
+    try {
+        const data = JSON.parse(event.data);
 
-        // // Lux
-        const luxData = await fetchSensorData("sensor", "3");
-        renderChart("sensorChart3", "Lux", luxData, "rgba(255,206,86,1)");
+        if (Array.isArray(data)) {
+            
+            if (data.length > 1) {
+                const historyData = data.reverse(); 
+                if (historyData.length > 0 && historyData[0].sensorId) {
+                    updateChartHistory(historyData[0].sensorId, historyData);
+                }
+            } else if (data.length === 1) {
+                updateChartRealtime(data[0]);
+            }
+        } else if (typeof data === 'object') {
+            updateChartRealtime(data);
+        }
 
-
-    } catch (err) {
-        console.error("Error loading dashboard:", err);
+    } catch (e) {
+        console.error("WS Error:", e);
     }
-        
+};
+
+function updateChartHistory(sensorId, dataArray) {
+    const chart = charts[sensorId];
+    if (chart) {
+        chart.data.labels = dataArray.map(d => new Date(d.timestamp).toLocaleTimeString());
+        chart.data.datasets[0].data = dataArray.map(d => d.value);
+        chart.update();
+        console.log(`Updated History for Sensor ${sensorId}`);
+    }
+}
+
+function updateChartRealtime(item) {
+    if (item.sensorId && item.value) {
+        const chart = charts[item.sensorId];
+        if (chart) {
+            const timeNow = new Date().toLocaleTimeString();
+            chart.data.labels.push(timeNow);
+            chart.data.datasets[0].data.push(item.value);
+
+            // Giữ lại 20 điểm thôi cho nhẹ
+            if (chart.data.labels.length > 20) {
+                chart.data.labels.shift();
+                chart.data.datasets[0].data.shift();
+            }
+            chart.update();
+        }
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadDashboard();
-
-    setInterval(loadDashboard, 10000);
+    initEmptyCharts(); // Vẽ khung biểu đồ trước
 });

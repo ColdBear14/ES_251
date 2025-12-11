@@ -6,73 +6,49 @@ const sensors = [
     { id: 3, name: 'Lux', unit: 'Lux', period: 10},
 ];
 
-async function fetchSensorData(collection, sensorId = "") {
-    let url = `http://10.135.180.108:3000/getData?collection=${collection}&sensorId=${sensorId}`;
-    try  {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error("Network response was not ok");
+ws.onmessage = (event) => {
+    try {
+        const data = JSON.parse(event.data);
+        console.log("Received WS Data:", data);
 
-        const data = await response.json();
-        return data;
+        if (Array.isArray(data)) {
+            data.forEach(item => processIncomingData(item));
+        } else if (typeof data === 'object') {
+            processIncomingData(data);
+        }
+
+    } catch (e) {
+        console.error("JSON Parse Error:", e);
     }
-    catch (error) {
-        console.error("Fetch sensor data error:", error);
-        return null;
-    }
-}
+};
 
-async function loadStoredSettings() {
-    for (const sensor of sensors) {
-
-        
-        let url = `http://10.135.180.108:3000/getData?collection=settings&id=${sensor.id}`;
-        
-        try {
-            const response = await fetch(url);
-            const rawData = await response.json();
-
-            if (Array.isArray(rawData) && rawData.length > 0) {
-                const setting = rawData[0];
-                
-                // Cập nhật lên giao diện
-                const nameInput = document.getElementById(`sensorName${setting.id}`);
-                const periodInput = document.getElementById(`sensorPeriod${setting.id}`);
-                
-                if (nameInput) nameInput.value = setting.name;
-                if (periodInput) periodInput.value = setting.period;
-                
-                // Cập nhật luôn biến local sensor sensors để đồng bộ
-                sensor.name = setting.name;
-                sensor.period = setting.period;
-            }
-        } catch (e) {
-            console.log("Không tải được settings cho ID " + sensor.id);
+function processIncomingData(item) {
+    // TRƯỜNG HỢP 1: Dữ liệu Cảm biến (Có 'sensorId' và 'value')
+    if (item.sensorId !== undefined && item.value !== undefined) {
+        const element = document.getElementById(`sensorValue${item.sensorId}`);
+        if (element) {
+            element.textContent = item.value;
+            
+            // Hiệu ứng nhấp nháy để biết có dữ liệu mới
+            element.style.transition = "color 0.2s";
+            element.style.color = "blue";
+            setTimeout(() => element.style.color = "black", 500);
         }
     }
-}
-
-async function updateAllSensorValues() {
-    for (const sensor of sensors) {
-        const rawData = await fetchSensorData("sensor", sensor.id);
+    
+    // TRƯỜNG HỢP 2: Dữ liệu Cài đặt (Có 'id', 'name', 'period')
+    else if (item.id !== undefined && item.period !== undefined) {
+        // Cập nhật ô input trên giao diện
+        const nameInput = document.getElementById(`sensorName${item.id}`);
+        const periodInput = document.getElementById(`sensorPeriod${item.id}`);
         
-        // Kiểm tra xem dữ liệu có hợp lệ không
-        if (Array.isArray(rawData) && rawData.length > 0) {
-            const data = rawData[0]; // Lấy phần tử mới nhất
-            
-            const element = document.getElementById(`sensorValue${data.sensorId}`);
-            
-            if (element) {
-                element.textContent = data.value; // Cập nhật giá trị
+        if (nameInput) nameInput.value = item.name;
+        if (periodInput) periodInput.value = item.period;
 
-            }
-
-        } 
-        // Dự phòng trường hợp trả về object đơn lẻ (nếu bạn đổi logic server sau này)
-        else if (rawData && rawData.value !== undefined && rawData.sensorId !== undefined) {
-             const element = document.getElementById(`sensorValue${rawData.sensorId}`);
-             if (element) {
-                element.textContent = rawData.value;
-            }
+        const localSensor = sensors.find(s => s.id === item.id);
+        if (localSensor) {
+            localSensor.name = item.name;
+            localSensor.period = item.period;
         }
     }
 }
@@ -88,28 +64,25 @@ function updateSensorSettings(sensorId) {
         return;
     }
 
-    // Send to server
     ws.send(JSON.stringify({
-        action: "settings",
+        action: "settings", // Vẫn giữ action khi gửi đi để ESP32 biết client muốn làm gì
         id: sensorId,
         name: name,
         period: period
     }));
 
-    // Visual feedback
+    // Visual feedback (Hiệu ứng nút bấm)
     const button = document.querySelector(`button[onclick="updateSensorSettings(${sensorId})"]`);
-    button.textContent = 'Saved!';
-    setTimeout(() => {
-        button.textContent = 'Save Settings';
-    }, 1000);
+    if(button) {
+        const originalText = button.textContent;
+        button.textContent = 'Sent!';
+        setTimeout(() => {
+            button.textContent = originalText;
+        }, 1000);
+    }
 }
 
-// Initialize everything when page loads
+
 document.addEventListener('DOMContentLoaded', () => {
-    loadStoredSettings();
-    updateAllSensorValues();
-    setInterval(updateAllSensorValues, 5000);
+    console.log("Ready. Waiting for WebSocket data...");
 });
-
-
-
